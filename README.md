@@ -1,0 +1,2 @@
+# Sudoku
+Classic sudoku puzzle
