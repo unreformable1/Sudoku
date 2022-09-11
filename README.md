@@ -1,2 +1,2 @@
 # Sudoku
-Classic sudoku puzzle
+Classic sudoku puzzle game

@@ -1,0 +1,8 @@
+# visual studio code settings
+.vscode
+
+# build directory
+build
+
+# fast run bash script
+run.sh
