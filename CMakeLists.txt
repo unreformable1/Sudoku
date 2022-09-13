@@ -8,6 +8,11 @@ set(SRC_FILES
     src/main.cpp
 )
 
+set(INC_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/inc/Widgets
+)
+
 find_package(SFML 2 REQUIRED audio graphics network system window)
 
 include_directories(${SFML_INCLUDE_DIR})
@@ -16,6 +21,4 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics)
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/inc
-)
+target_include_directories(${PROJECT_NAME} PUBLIC ${INC_FILES})
