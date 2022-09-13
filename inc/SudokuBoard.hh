@@ -10,10 +10,12 @@
 class SudokuBoard: public Board<9,9,int>
 {
 public:
-    void draw(sf::RenderTarget& render_target, const sf::Font& font, const sf::Vector2f& size, const sf::Vector2f& pos = sf::Vector2f()) const;
     bool full() const;
     bool valid() const;
     bool valid(int row, int col) const;
+    bool valid(int index) const;
+    bool validMove(int row, int col, int value) const;
+    bool validMove(int index, int value) const;
 
 
 private:
@@ -26,86 +28,12 @@ private:
     bool validChunk(int chunk) const;
 
     bool validCells(int* cells, int cells_count) const;
+
+
+    int countValuesInRow(int row, int value) const;
+    int countValuesInCol(int col, int value) const;
+    int countValuesInChunk(int chunk, int value) const;
 };
-
-void SudokuBoard::draw(sf::RenderTarget& render_target, const sf::Font& font, const sf::Vector2f& size, const sf::Vector2f& pos) const
-{
-    // Setup board's background
-    sf::RectangleShape background;
-    background.setPosition(pos);
-    background.setSize(size);
-    background.setFillColor(sf::Color::Black);
-
-    // Set up digits onto cells
-    sf::Text text;
-    text.setFont(font);
-    text.setFillColor(sf::Color::Black);
-
-    // Draw background
-    render_target.draw(background);
-
-    // Set up cells
-    {
-        // Make reference scale for board elements
-        float cell_scale = 3.0f;
-        float board_frame_scale = 0.1f;
-        float cell_frame_scale = 0.05f;
-        float chunk_frame_scale = 0.05f;
-        float scale_sum = 9*cell_scale + 2*board_frame_scale + 12*cell_frame_scale + 2*chunk_frame_scale;
-
-        // Make sizes depending on scales of elements
-        const sf::Vector2f& cell_size = cell_scale/scale_sum * size;
-        const float& board_frame_thickness = board_frame_scale/scale_sum * ((size.x + size.y)/2);
-        const float& cell_frame_thickness = cell_frame_scale/scale_sum * ((size.x + size.y)/2);
-        const float& chunk_frame_thickness = chunk_frame_scale/scale_sum * ((size.x + size.y)/2);
-
-        // Setup cells
-        sf::RectangleShape rect;
-        rect.setFillColor(sf::Color::White);
-        rect.setSize(cell_size);
-
-        // Create and position cells
-        float pos_x;
-        float pos_y = board_frame_thickness + cell_frame_thickness;
-        for(int row = 0; row < 9; ++row)
-        {
-            pos_x = board_frame_thickness + cell_frame_thickness;
-            for(int col = 0; col < 9; ++col)
-            {
-                if(valid(row, col))
-                    rect.setFillColor(sf::Color::White);
-                else
-                    rect.setFillColor(sf::Color::Red);  
-                rect.setPosition(pos_x, pos_y);
-                render_target.draw(rect);
-
-                text.setString(std::to_string(m_cells[9 * row + col]));
-                const sf::FloatRect& text_bounds = text.getLocalBounds();
-                const float& text_x = pos_x + cell_size.x/2 - text_bounds.left - text_bounds.width/2;
-                const float& text_y = pos_y + cell_size.y/2 - text_bounds.top - text_bounds.height/2;
-                text.setPosition(text_x, text_y);
-                render_target.draw(text);
-
-                pos_x += cell_size.x;
-                pos_x += cell_frame_thickness;
-
-                if((col + 1) % 3 == 0  &&  col != 0) // every 3 cells emplaced
-                {
-                    pos_x += chunk_frame_thickness;
-                    pos_x += cell_frame_thickness;
-                }
-            }
-            pos_y += cell_size.y;
-            pos_y += cell_frame_thickness;
-
-            if((row + 1) % 3 == 0  &&  row != 0) // every 3 rows of cells emplaced
-            {
-                pos_y += chunk_frame_thickness;
-                pos_y += cell_frame_thickness;
-            }
-        }
-    }
-}
 
 bool SudokuBoard::full() const
 {
@@ -126,53 +54,50 @@ bool SudokuBoard::valid() const
 
 bool SudokuBoard::valid(int row, int col) const
 {
-    int chunk;
-    if(row < 3)
-    {
-        if(col < 3)
-        {
-            chunk = 0;
-        }
-        else if(col < 6)
-        {
-            chunk = 1;
-        }
-        else
-        {
-            chunk = 2;
-        }
-    }
-    else if(row < 6)
-    {
-        if(col < 3)
-        {
-            chunk = 3;
-        }
-        else if(col < 6)
-        {
-            chunk = 4;
-        }
-        else
-        {
-            chunk = 5;
-        }
-    }
-    else
-    {
-        if(col < 3)
-        {
-            chunk = 6;
-        }
-        else if(col < 6)
-        {
-            chunk = 7;
-        }
-        else
-        {
-            chunk = 8;
-        }
-    }
-    return validRow(row) && validCol(col) && validChunk(chunk);
+    int value = m_cells[9*row + col];
+
+    if(value == 0)
+        return true;
+
+    // Calculate chunk depending on row and col values
+    int chunk_row = row / 3;
+    int chunk_col = col / 3;
+    int chunk = 3*chunk_row + chunk_col;
+
+    return countValuesInRow(row, value) < 2
+        && countValuesInCol(col, value) < 2
+        && countValuesInChunk(chunk, value) < 2;
+}
+
+bool SudokuBoard::valid(int index) const
+{
+    // Convert index to row and col
+    int row = index / 9;
+    int col = index % 9;
+
+    return valid(row, col);
+}
+
+bool SudokuBoard::validMove(int row, int col, int value) const
+{
+    // Calculate chunk depending on row and col values
+    int chunk_row = row / 3;
+    int chunk_col = col / 3;
+    int chunk = 3*chunk_row + chunk_col;
+    
+    // Row, col and chunk cannot have given value yet
+    return countValuesInRow(row, value) == 0
+        && countValuesInCol(col, value) == 0
+        && countValuesInChunk(chunk, value) == 0;
+}
+
+bool SudokuBoard::validMove(int index, int value) const
+{
+    // Convert index to row and col
+    int row = index / 9;
+    int col = index % 9;
+
+    return validMove(row, col, value);
 }
 
 bool SudokuBoard::validRows() const
@@ -277,4 +202,44 @@ bool SudokuBoard::validCells(int* cells, int cells_count) const
         }
     }
     return true;
+}
+
+int SudokuBoard::countValuesInRow(int row, int value) const
+{
+    int count = 0;
+    for(int col = 0; col < 9; ++col)
+    {
+        if(m_cells[9*row + col] == value)
+            ++count;
+    }
+    return count;
+}
+
+int SudokuBoard::countValuesInCol(int col, int value) const
+{
+    int count = 0;
+    for(int row = 0; row < 9; ++row)
+    {
+        if(m_cells[9*row + col] == value)
+            ++count;
+    }
+    return count;
+}
+
+int SudokuBoard::countValuesInChunk(int chunk, int value) const
+{
+    // Calculate chunk "starting" row and col
+    int chunk_row = 3*(chunk / 3);
+    int chunk_col = 3*(chunk % 3);
+
+    int count = 0;
+    for(int row = chunk_row; row < chunk_row + 3; ++row)
+    {
+        for(int col = chunk_col; col < chunk_col + 3; ++col)
+        {
+            if(m_cells[9*row + col] == value)
+                ++count;
+        }
+    }
+    return count;
 }
