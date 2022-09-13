@@ -67,6 +67,19 @@ public:
     void print() const;
 
 
+    // Returns cell value by const reference
+    const T& operator()(int row, int col) const;
+
+    // Returns cell value by const reference
+    const T& operator()(int index) const;
+
+    // Returns cell value by reference
+    T& operator()(int row, int col);
+
+    // Returns cell value by reference
+    T& operator()(int index);
+
+
 protected:
     T m_cells[N * M]{};
 };
@@ -154,4 +167,28 @@ void Board<N,M,T>::print() const
         }
         std::cout << std::endl;
     }
+}
+
+template <int N, int M, typename T>
+const T& Board<N,M,T>::operator()(int row, int col) const
+{
+    return m_cells[N*row + col];
+}
+
+template <int N, int M, typename T>
+const T& Board<N,M,T>::operator()(int index) const
+{
+    return m_cells[index];
+}
+
+template <int N, int M, typename T>
+T& Board<N,M,T>::operator()(int row, int col)
+{
+    return m_cells[N*row + col];
+}
+
+template <int N, int M, typename T>
+T& Board<N,M,T>::operator()(int index)
+{
+    return m_cells[index];
 }
