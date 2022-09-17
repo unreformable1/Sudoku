@@ -37,7 +37,7 @@ private:
 
 bool SudokuBoard::full() const
 {
-    for(int i = 0; i < size(); ++i)
+    for(int i = size() - 1; i >= 0; --i)
     {
         if(m_cells[i] == 0)
         {
@@ -85,7 +85,7 @@ bool SudokuBoard::validMove(int row, int col, int value) const
     int chunk_col = col / 3;
     int chunk = 3*chunk_row + chunk_col;
     
-    // Row, col and chunk cannot have given value yet
+    // Row, col and chunk cannot have given value
     return countValuesInRow(row, value) == 0
         && countValuesInCol(col, value) == 0
         && countValuesInChunk(chunk, value) == 0;
