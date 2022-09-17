@@ -6,18 +6,18 @@
 class RNG
 {
 public:
-    RNG();
-    int get(const int& min, const int& max);
+    static int get(const int& min, const int& max);
 
 
 private:
-    std::random_device rd;
-    std::mt19937 gen;
-    std::uniform_int_distribution<int> distrib;
+    static std::random_device rd;
+    static std::mt19937 gen;
+    static std::uniform_int_distribution<int> distrib;
 };
 
-RNG::RNG()
-:   gen(rd()) {}
+std::random_device RNG::rd{};
+std::mt19937 RNG::gen(rd());
+std::uniform_int_distribution<int> RNG::distrib{};
 
 int RNG::get(const int& min, const int& max)
 {
