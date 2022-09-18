@@ -44,16 +44,16 @@ void Application::run()
     WidgetsManager widgets_manager;
     SudokuBoard board;
 
-    SudokuBoardView board_view(board, sf::Vector2f(0, 0), sf::Vector2f(600, 600));
+    SudokuBoardView board_view(board, sf::Vector2f(0, 0), sf::Vector2f(BOARD_WIDTH, BOARD_HEIGHT));
     board_view.setFont(m_font);
 
-    m_renderWindow.clear(sf::Color(150, 150, 150));
+    m_renderWindow.clear(sf::Color(140, 140, 140));
 
     board_view.draw(m_renderWindow);
 
-    Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
+    //Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
     Button erase_button(sf::Vector2f(BOARD_WIDTH + 25, 100), sf::Vector2f(100, 50), "Delete");
-    Button hint_button(sf::Vector2f(BOARD_WIDTH + 25, 175), sf::Vector2f(100, 50), "Hint");
+    //Button hint_button(sf::Vector2f(BOARD_WIDTH + 25, 175), sf::Vector2f(100, 50), "Hint");
 
     Button num1_button(sf::Vector2f(BOARD_WIDTH + 25, 250),  sf::Vector2f(65, 65), "1");
     Button num2_button(sf::Vector2f(BOARD_WIDTH + 100, 250), sf::Vector2f(65, 65), "2");
@@ -65,9 +65,9 @@ void Application::run()
     Button num8_button(sf::Vector2f(BOARD_WIDTH + 100, 400), sf::Vector2f(65, 65), "8");
     Button num9_button(sf::Vector2f(BOARD_WIDTH + 175, 400), sf::Vector2f(65, 65), "9");
 
-    undo_button.setFont(m_font);
+    //undo_button.setFont(m_font);
     erase_button.setFont(m_font);
-    hint_button.setFont(m_font);
+    //hint_button.setFont(m_font);
 
     num1_button.setFont(m_font);
     num2_button.setFont(m_font);
@@ -79,9 +79,9 @@ void Application::run()
     num8_button.setFont(m_font);
     num9_button.setFont(m_font);
 
-    widgets_manager.add(&undo_button);
+    //widgets_manager.add(&undo_button);
     widgets_manager.add(&erase_button);
-    widgets_manager.add(&hint_button);
+    //widgets_manager.add(&hint_button);
     widgets_manager.add(&num1_button);
     widgets_manager.add(&num2_button);
     widgets_manager.add(&num3_button);
@@ -95,6 +95,8 @@ void Application::run()
     widgets_manager.draw(m_renderWindow);
 
     m_renderWindow.display();
+
+    std::cout << std::endl << "Click H to get some help" << std::endl;
 
     while(m_renderWindow.isOpen())
     {
@@ -134,6 +136,123 @@ void Application::run()
                             if(cells[i].hasFocus())
                             {
                                 board.set(i, 0);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num1_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 1);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num2_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 2);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num3_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 3);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num4_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 4);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num5_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 5);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num6_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 6);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num7_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 7);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num8_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 8);
+                            }
+                        }
+                        board_view.draw(m_renderWindow);
+                        m_renderWindow.display();
+                    }
+                    else if(num9_button.isMouseOver(m_renderWindow))
+                    {
+                        std::vector<TextBox>& cells = board_view.getCells();
+                        for(int i = 0; i < 81; ++i)
+                        {
+                            if(cells[i].hasFocus())
+                            {
+                                board.set(i, 9);
                             }
                         }
                         board_view.draw(m_renderWindow);
@@ -188,7 +307,7 @@ void Application::run()
                     std::cout << "C - clear the board" << std::endl;
                     std::cout << "N - compute number of solutions" << std::endl;
                     std::cout << "S - solve the board" << std::endl;
-                    std::cout << "G - generate random board" << std::endl;
+                    std::cout << "G - generate random board (may take up to over 15 sec)" << std::endl;
                     std::cout << std::endl;
                 }
                 else if(event.key.code == sf::Keyboard::C)
