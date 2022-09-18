@@ -266,5 +266,5 @@ void Application::initRenderWindow()
 
 void Application::initFont()
 {
-    m_font.loadFromFile("../fonts/arial/arial.ttf");
+    m_font.loadFromFile("../assets/fonts/arial/arial.ttf");
 }
