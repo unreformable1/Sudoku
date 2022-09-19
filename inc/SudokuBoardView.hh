@@ -1,8 +1,7 @@
 #pragma once
 
 #include "SudokuBoard.hh"
-#include "Button.hh"
-#include "TextBox.hh"
+#include "CellView.hh"
 
 #include <vector>
 
@@ -16,7 +15,7 @@ public:
     
     void setFont(const sf::Font& font);
 
-    std::vector<TextBox>& getCells() { return m_cells; }
+    std::vector<CellView>& getCells() { return m_cells; }
 
 
 private:
@@ -29,7 +28,7 @@ private:
     const SudokuBoard& m_sudokuBoard;
 
     sf::RectangleShape m_bg;
-    std::vector<TextBox> m_cells;
+    std::vector<CellView> m_cells;
 };
 
 SudokuBoardView::SudokuBoardView(const SudokuBoard& sudoku_board, const sf::Vector2f& pos, const sf::Vector2f& size)
@@ -68,9 +67,9 @@ void SudokuBoardView::draw(sf::RenderTarget& render_target)
 
 void SudokuBoardView::setFont(const sf::Font& font)
 {
-    for(TextBox& text_box : m_cells)
+    for(CellView& cell : m_cells)
     {
-        text_box.setFont(font);
+        cell.setFont(font);
     }
 }
 
@@ -107,7 +106,7 @@ void SudokuBoardView::initCells(const sf::Vector2f& board_pos, const sf::Vector2
             pos_x = board_frame_thickness + cell_frame_thickness;
             for(int col = 0; col < 9; ++col)
             {
-                m_cells.emplace_back(TextBox(sf::Vector2f(pos_x, pos_y), cell_size, std::to_string(m_sudokuBoard.get(row, col))));
+                m_cells.emplace_back(CellView(sf::Vector2f(pos_x, pos_y), cell_size, std::to_string(m_sudokuBoard.get(row, col))));
 
                 pos_x += cell_size.x;
                 pos_x += cell_frame_thickness;
