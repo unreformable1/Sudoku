@@ -11,7 +11,8 @@ public:
 };
 
 Button::Button(const sf::Vector2f& pos, const sf::Vector2f& size, const std::string& text)
-:   Widget(pos, size, text)
 {
-
+    setPosition(pos);
+    setSize(size);
+    setTextString(text);
 }
