@@ -1,76 +1,27 @@
 #pragma once
 
 #include "SudokuBoard.hh"
-#include "CellView.hh"
+#include "TextBox.hh"
 
 #include <vector>
 
 
-class SudokuBoardView: public IWidget
+
+class SudokuBoardView: public Widget
 {
 public:
-    SudokuBoardView(const SudokuBoard& sudoku_board, const sf::Vector2f& pos, const sf::Vector2f& size);
-    bool isMouseOver(const sf::RenderWindow& render_window);
-    void draw(sf::RenderTarget& render_target);
-    
-    void setFont(const sf::Font& font);
-
-    std::vector<CellView>& getCells() { return m_cells; }
+    SudokuBoardView(const sf::Vector2f& pos, const sf::Vector2f& size);
 
 
 private:
     void initBg(const sf::Vector2f& board_pos, const sf::Vector2f& board_size);
     void initCells(const sf::Vector2f& board_pos, const sf::Vector2f& board_size);
-    void update();
-
-
-private:
-    const SudokuBoard& m_sudokuBoard;
-
-    sf::RectangleShape m_bg;
-    std::vector<CellView> m_cells;
 };
 
-SudokuBoardView::SudokuBoardView(const SudokuBoard& sudoku_board, const sf::Vector2f& pos, const sf::Vector2f& size)
-:   m_sudokuBoard(sudoku_board)
+SudokuBoardView::SudokuBoardView(const sf::Vector2f& pos, const sf::Vector2f& size)
 {
     initBg(pos, size);
     initCells(pos, size);
-}
-
-bool SudokuBoardView::isMouseOver(const sf::RenderWindow& render_window)
-{
-    const sf::Vector2i& mouse_pos = sf::Mouse::getPosition(render_window);
-    
-    if(m_bg.getGlobalBounds().contains(static_cast<sf::Vector2f>(mouse_pos)))
-        return true;
-    return false;
-}
-
-void SudokuBoardView::draw(sf::RenderTarget& render_target)
-{
-    update();
-
-    render_target.draw(m_bg);
-    for(int i = 0; i < m_cells.size(); ++i)
-    {
-        if(m_cells[i].hasFocus())
-            m_cells[i].setBgColor(sf::Color(137, 207, 240));    // baby blue :P
-        else if(!m_sudokuBoard.valid(i))
-            m_cells[i].setBgColor(sf::Color(255, 119, 121));    // baby red :P
-        else
-            m_cells[i].setBgColor(sf::Color::White);
-
-        m_cells[i].draw(render_target);
-    }
-}
-
-void SudokuBoardView::setFont(const sf::Font& font)
-{
-    for(CellView& cell : m_cells)
-    {
-        cell.setFont(font);
-    }
 }
 
 void SudokuBoardView::initBg(const sf::Vector2f& board_pos, const sf::Vector2f& board_size)
@@ -82,7 +33,7 @@ void SudokuBoardView::initBg(const sf::Vector2f& board_pos, const sf::Vector2f& 
 
 void SudokuBoardView::initCells(const sf::Vector2f& board_pos, const sf::Vector2f& board_size)
 {
-    m_cells.reserve(81);
+    m_children.reserve(81);
     // Set up cells
     {
         // Make reference scale for board elements
@@ -106,7 +57,7 @@ void SudokuBoardView::initCells(const sf::Vector2f& board_pos, const sf::Vector2
             pos_x = board_frame_thickness + cell_frame_thickness;
             for(int col = 0; col < 9; ++col)
             {
-                m_cells.emplace_back(CellView(sf::Vector2f(pos_x, pos_y), cell_size, std::to_string(m_sudokuBoard.get(row, col))));
+                m_children.emplace_back(new TextBox(sf::Vector2f(pos_x, pos_y), cell_size, "0"));
 
                 pos_x += cell_size.x;
                 pos_x += cell_frame_thickness;
@@ -126,16 +77,5 @@ void SudokuBoardView::initCells(const sf::Vector2f& board_pos, const sf::Vector2
                 pos_y += cell_frame_thickness;
             }
         }
-    }
-}
-
-void SudokuBoardView::update()
-{
-    for(int i = 0; i < m_sudokuBoard.size(); ++i)
-    {
-        if(m_sudokuBoard(i) == 0)
-            m_cells[i].setText("");
-        else
-            m_cells[i].setText(std::to_string(m_sudokuBoard(i)));
     }
 }
