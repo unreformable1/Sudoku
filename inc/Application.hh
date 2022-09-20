@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Button.hh"
-#include "SudokuBoard.hh"
-#include "SudokuBoardGenerator.hh"
 #include "SudokuBoardController.hh"
-#include "SudokuBoardView.hh"
 #include "WidgetsManager.hh"
 
 #define WIN_WIDTH 900
@@ -40,17 +37,10 @@ Application::Application()
 
 void Application::run()
 {
-    WidgetsManager widgets_manager;
     SudokuBoard board;
-
-    SudokuBoardView board_view(board, sf::Vector2f(0, 0), sf::Vector2f(BOARD_WIDTH, BOARD_HEIGHT));
-    board_view.setFont(m_font);
-
+    SudokuBoardView board_view(sf::Vector2f(0, 0), sf::Vector2f(BOARD_WIDTH, BOARD_HEIGHT));
     SudokuBoardController board_controller(m_renderWindow, board, board_view);
 
-    m_renderWindow.clear(sf::Color(140, 140, 140));
-
-    board_view.draw(m_renderWindow);
 
     //Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
     Button delete_button(sf::Vector2f(BOARD_WIDTH + 25, 100), sf::Vector2f(100, 50), "Delete");
@@ -66,19 +56,9 @@ void Application::run()
     Button num8_button(sf::Vector2f(BOARD_WIDTH + 100, 400), sf::Vector2f(65, 65), "8");
     Button num9_button(sf::Vector2f(BOARD_WIDTH + 175, 400), sf::Vector2f(65, 65), "9");
 
-    //undo_button.setFont(m_font);
-    delete_button.setFont(m_font);
-    //hint_button.setFont(m_font);
-
-    num1_button.setFont(m_font);
-    num2_button.setFont(m_font);
-    num3_button.setFont(m_font);
-    num4_button.setFont(m_font);
-    num5_button.setFont(m_font);
-    num6_button.setFont(m_font);
-    num7_button.setFont(m_font);
-    num8_button.setFont(m_font);
-    num9_button.setFont(m_font);
+    WidgetsManager widgets_manager;
+    
+    widgets_manager.add(&board_view);
 
     //widgets_manager.add(&undo_button);
     widgets_manager.add(&delete_button);
@@ -93,6 +73,9 @@ void Application::run()
     widgets_manager.add(&num8_button);
     widgets_manager.add(&num9_button);
 
+
+    m_renderWindow.clear(sf::Color(140, 140, 140));
+    widgets_manager.setFont(m_font);
     widgets_manager.draw(m_renderWindow);
 
     m_renderWindow.display();
@@ -110,58 +93,60 @@ void Application::run()
             }
             else if(event.type == sf::Event::MouseButtonReleased)
             {
+                const sf::Vector2i& mouse_pos = sf::Mouse::getPosition(m_renderWindow);
+
                 if(event.mouseButton.button == sf::Mouse::Left)
                 {
-                    if(board_view.isMouseOver(m_renderWindow))
+                    if(board_view.contains(mouse_pos))
                     {
-                        board_controller.onMouseClick(sf::Mouse::Left);
+                        board_controller.onMouseClick(sf::Mouse::Left, mouse_pos);
                     }
-                    else if(delete_button.isMouseOver(m_renderWindow))
+                    else if(delete_button.contains(mouse_pos))
                     {
                         board_controller.onDeleteButton();
                     }
-                    else if(num1_button.isMouseOver(m_renderWindow))
+                    else if(num1_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(1);
                     }
-                    else if(num2_button.isMouseOver(m_renderWindow))
+                    else if(num2_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(2);
                     }
-                    else if(num3_button.isMouseOver(m_renderWindow))
+                    else if(num3_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(3);
                     }
-                    else if(num4_button.isMouseOver(m_renderWindow))
+                    else if(num4_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(4);
                     }
-                    else if(num5_button.isMouseOver(m_renderWindow))
+                    else if(num5_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(5);
                     }
-                    else if(num6_button.isMouseOver(m_renderWindow))
+                    else if(num6_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(6);
                     }
-                    else if(num7_button.isMouseOver(m_renderWindow))
+                    else if(num7_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(7);
                     }
-                    else if(num8_button.isMouseOver(m_renderWindow))
+                    else if(num8_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(8);
                     }
-                    else if(num9_button.isMouseOver(m_renderWindow))
+                    else if(num9_button.contains(mouse_pos))
                     {
                         board_controller.onScreenNum(9);
                     }
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right)
                 {
-                    if(board_view.isMouseOver(m_renderWindow))
+                    if(board_view.contains(mouse_pos))
                     {
-                        board_controller.onMouseClick(sf::Mouse::Right);
+                        board_controller.onMouseClick(sf::Mouse::Right, mouse_pos);
                     }
                 }
             }
@@ -186,6 +171,13 @@ void Application::run()
                     std::cout << std::endl;
                 }
             }
+            // board has to be full and valid so its win
+            // some notes:
+            // - checking must only occur while user is putting number on board (?when input manager states number is added?)
+            // - after win plays some animation
+            // - pops up window with new game and shows game time
+            /* if(board.full() && board.valid())
+                std::cout << "yeee"; */
         }
     }
 }

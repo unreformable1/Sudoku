@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IWidget.hh"
+#include "Widget.hh"
 
 #include <vector>
 
@@ -8,23 +8,32 @@
 class WidgetsManager
 {
 public:
-    void add(IWidget* widget);
-    void draw(sf::RenderTarget& render_target);
+    void add(Widget* widget);
+    void draw(sf::RenderTarget& target);
+    void setFont(const sf::Font& font);
 
 
 private:
-    std::vector<IWidget*> m_widgets;
+    std::vector<Widget*> m_widgets;
 };
 
-void WidgetsManager::add(IWidget* widget)
+void WidgetsManager::add(Widget* widget)
 {
     m_widgets.emplace_back(widget);
 }
 
-void WidgetsManager::draw(sf::RenderTarget& render_target)
+void WidgetsManager::draw(sf::RenderTarget& target)
 {
-    for(IWidget* widget : m_widgets)
+    for(Widget* widget : m_widgets)
     {
-        widget->draw(render_target);
+        widget->draw(target);
+    }
+}
+
+void WidgetsManager::setFont(const sf::Font& font)
+{
+    for(Widget* widget : m_widgets)
+    {
+        widget->setTextFont(font);
     }
 }
