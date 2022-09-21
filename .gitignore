@@ -1,8 +1,11 @@
 # visual studio code settings
 .vscode
 
-# build directory
-build
+# build files
+build/*
+
+# tests build files
+tests/build/*
 
 # todo
 TODO.md
