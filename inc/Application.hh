@@ -42,9 +42,9 @@ void Application::run()
     SudokuBoardController board_controller(m_renderWindow, board, board_view);
 
 
-    //Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
     Button delete_button(sf::Vector2f(BOARD_WIDTH + 25, 100), sf::Vector2f(100, 50), "Delete");
-    //Button hint_button(sf::Vector2f(BOARD_WIDTH + 25, 175), sf::Vector2f(100, 50), "Hint");
+    Button hint_button(sf::Vector2f(BOARD_WIDTH + 25, 175), sf::Vector2f(100, 50), "Hint");
+    //Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
 
     Button num1_button(sf::Vector2f(BOARD_WIDTH + 25, 250),  sf::Vector2f(65, 65), "1");
     Button num2_button(sf::Vector2f(BOARD_WIDTH + 100, 250), sf::Vector2f(65, 65), "2");
@@ -60,9 +60,9 @@ void Application::run()
     
     widgets_manager.add(&board_view);
 
-    //widgets_manager.add(&undo_button);
     widgets_manager.add(&delete_button);
-    //widgets_manager.add(&hint_button);
+    widgets_manager.add(&hint_button);
+    //widgets_manager.add(&undo_button);
     widgets_manager.add(&num1_button);
     widgets_manager.add(&num2_button);
     widgets_manager.add(&num3_button);
@@ -99,64 +99,105 @@ void Application::run()
                 {
                     if(board_view.contains(mouse_pos))
                     {
-                        board_controller.onMouseClick(sf::Mouse::Left, mouse_pos);
+                        board_controller.highlightClickedCell(mouse_pos);
                     }
                     else if(delete_button.contains(mouse_pos))
                     {
-                        board_controller.onDeleteButton();
+                        board_controller.deleteCell();
+                    }
+                    else if(hint_button.contains(mouse_pos))
+                    {
+                        board_controller.getHint();
                     }
                     else if(num1_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(1);
+                        board_controller.setCell(1);
                     }
                     else if(num2_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(2);
+                        board_controller.setCell(2);
                     }
                     else if(num3_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(3);
+                        board_controller.setCell(3);
                     }
                     else if(num4_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(4);
+                        board_controller.setCell(4);
                     }
                     else if(num5_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(5);
+                        board_controller.setCell(5);
                     }
                     else if(num6_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(6);
+                        board_controller.setCell(6);
                     }
                     else if(num7_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(7);
+                        board_controller.setCell(7);
                     }
                     else if(num8_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(8);
+                        board_controller.setCell(8);
                     }
                     else if(num9_button.contains(mouse_pos))
                     {
-                        board_controller.onScreenNum(9);
+                        board_controller.setCell(9);
                     }
                 }
                 else if(event.mouseButton.button == sf::Mouse::Right)
                 {
                     if(board_view.contains(mouse_pos))
                     {
-                        board_controller.onMouseClick(sf::Mouse::Right, mouse_pos);
+                        board_controller.highlightClickedCell(mouse_pos);
+                        board_controller.deleteCell();
                     }
                 }
             }
             else if(event.type == sf::Event::KeyReleased)
             {
-                board_controller.onKey(event.key.code);
-                
                 if(event.key.code == sf::Keyboard::Escape)
                 {
                     m_renderWindow.close();
+                }
+                else if(event.key.code >= sf::Keyboard::Num1 && event.key.code <= sf::Keyboard::Num9)
+                {
+                    // Transform sf::Keyboard::Key enum value to (1-9) digit
+                    int digit = static_cast<int>(event.key.code) - 26;
+                    board_controller.setCell(digit);
+                }
+                else if(event.key.code == sf::Keyboard::Up)
+                {
+                    board_controller.moveTo(SudokuBoardController::Direction::Up);
+                }
+                else if(event.key.code == sf::Keyboard::Down)
+                {
+                    board_controller.moveTo(SudokuBoardController::Direction::Down);
+                }
+                else if(event.key.code == sf::Keyboard::Left)
+                {
+                    board_controller.moveTo(SudokuBoardController::Direction::Left);
+                }
+                else if(event.key.code == sf::Keyboard::Right)
+                {
+                    board_controller.moveTo(SudokuBoardController::Direction::Right);
+                }
+                else if(event.key.code == sf::Keyboard::G)
+                {
+                    board_controller.generateBoard();
+                }
+                else if(event.key.code == sf::Keyboard::S)
+                {
+                    board_controller.solveBoard();
+                }
+                else if(event.key.code == sf::Keyboard::C)
+                {
+                    board_controller.clearBoard();
+                }
+                else if(event.key.code == sf::Keyboard::N)
+                {
+                    board_controller.displaySolutions();
                 }
                 else if(event.key.code == sf::Keyboard::H)
                 {
@@ -164,11 +205,10 @@ void Application::run()
                     std::cout << "AVAILABLE KEY COMMANDS:" << std::endl;
                     std::cout << "LMB + (1-9) - place digit on the board" << std::endl;
                     std::cout << "RMB - delete clicked cell" << std::endl;
+                    std::cout << "G - generate random board (may take up to over 15 sec)" << std::endl;
+                    std::cout << "S - solve the board" << std::endl;
                     std::cout << "C - clear the board" << std::endl;
                     std::cout << "N - compute number of solutions" << std::endl;
-                    std::cout << "S - solve the board" << std::endl;
-                    std::cout << "G - generate random board (may take up to over 15 sec)" << std::endl;
-                    std::cout << std::endl;
                 }
             }
             // board has to be full and valid so its win
