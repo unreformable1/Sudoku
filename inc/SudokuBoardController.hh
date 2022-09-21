@@ -5,18 +5,40 @@
 #include "SudokuBoardGenerator.hh"
 
 #include <chrono>
+#include <stack>
 
 
 class SudokuBoardController
 {
 public:
+    struct Action {
+
+    };
+
+    enum Direction {
+        Up,
+        Down,
+        Left,
+        Right
+    };
+
+
+public:
     SudokuBoardController(sf::RenderWindow& render_window, SudokuBoard& board, SudokuBoardView& board_view);
-    void onKey(sf::Keyboard::Key key);
-    void onMouseClick(sf::Mouse::Button button, const sf::Vector2i& mouse_pos);
-    void onScreenNum(int num);
-    void onDeleteButton();
-    void onUndoButton();
-    void onHintButton();
+
+    void highlightClickedCell(const sf::Vector2i& mouse_pos);
+    void moveTo(Direction dir);
+
+    void generateBoard();
+    void solveBoard();
+    void clearBoard();
+    void displaySolutions();
+    
+    void setCell(int value);
+    void deleteCell();
+
+    void getHint();
+    void undoAction();
 
 
 private:
@@ -27,6 +49,10 @@ private:
     sf::RenderWindow& m_renderWindow;
     SudokuBoard& m_board;
     SudokuBoardView& m_boardView;
+
+    SudokuBoard m_solvedBoard;
+
+    std::stack<Action> m_actions;
 };
 
 SudokuBoardController::SudokuBoardController(sf::RenderWindow& render_window, SudokuBoard& board, SudokuBoardView& board_view)
@@ -35,140 +61,161 @@ SudokuBoardController::SudokuBoardController(sf::RenderWindow& render_window, Su
     updateView();
 }
 
-void SudokuBoardController::onKey(sf::Keyboard::Key key)
+void SudokuBoardController::highlightClickedCell(const sf::Vector2i& mouse_pos)
 {
-    if(key >= sf::Keyboard::Num1 && key <= sf::Keyboard::Num9)
+    std::vector<Widget*>& cells = m_boardView.getChildren();
+    for(Widget* cell : cells)
     {
-        std::vector<Widget*>& cells = m_boardView.getChildren();
-        for(int i = 0; i < cells.size(); ++i)
+        if(cell->contains(mouse_pos))
         {
-            if(cells[i]->getFocus())
-            {
-                m_board.set(i, key - 26);   // "key - 26" changes sf::Keyboard::Key enum value to (1-9) digit
-            }
-        }
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
-    else if(key == sf::Keyboard::C)
-    {
-        m_board.clear();
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
-    else if(key == sf::Keyboard::N)
-    {
-        if(!m_board.valid())
-        {
-            std::cout << "Cannot find solutions to a sudoku board that is not correct." << std::endl;
-            return;
-        }
-
-        std::cout << std::endl;
-        auto start = std::chrono::high_resolution_clock::now();
-        const int& solutions_count = SudokuBoardSolver::solutions(m_board);
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        std::cout << "Solution generation time: " << duration.count() << " µs" << std::endl;
-
-        if(solutions_count == SudokuBoardSolver::MAX_SOLUTIONS)
-        {
-            std::cout << "There are more than " << SudokuBoardSolver::MAX_SOLUTIONS << " solutions.";
+            cell->setFocus(true);
         }
         else
         {
-            std::cout << "Solutions: " << solutions_count;
+            cell->setFocus(false);
         }
-        std::cout << std::endl;
     }
-    else if(key == sf::Keyboard::S)
-    {
-        if(!m_board.valid())
-        {
-            std::cout << std::endl << "Can't solve invalid board" << std::endl;
-            return;
-        }
-
-        std::cout << std::endl;
-        auto start = std::chrono::high_resolution_clock::now();
-        SudokuBoardSolver::solve(m_board);
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        std::cout << "Board solving time: " << duration.count() << " µs" << std::endl;
-
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
-    else if(key == sf::Keyboard::G)
-    {
-        std::cout << std::endl;
-        auto start = std::chrono::high_resolution_clock::now();
-        SudokuBoardGenerator::generate(m_board);
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
-        std::cout << "Board generation time: " << duration.count() << " µs" << std::endl;
-
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
+    
+    updateView();
 }
 
-void SudokuBoardController::onMouseClick(sf::Mouse::Button button, const sf::Vector2i& mouse_pos)
+void SudokuBoardController::moveTo(Direction dir)
 {
-    if(button == sf::Mouse::Left)
-    {
-        std::vector<Widget*>& cells = m_boardView.getChildren();
-        for(Widget* cell : cells)
-        {
-            if(cell->contains(mouse_pos))
-            {
-                cell->setFocus(true);
-            }
-            else
-            {
-                cell->setFocus(false);
-            }
-        }
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
-    else if(button == sf::Mouse::Right)
-    {
-        std::vector<Widget*>& cells = m_boardView.getChildren();
-        for(int i = 0; i < cells.size(); ++i)
-        {
-            if(cells[i]->contains(mouse_pos))
-            {
-                cells[i]->setFocus(true);
-                m_board.set(i, 0);
-            }
-            else
-                cells[i]->setFocus(false);
-        }
-        updateView();
-        m_boardView.draw(m_renderWindow);
-        m_renderWindow.display();
-    }
-}
-
-void SudokuBoardController::onScreenNum(int num)
-{
+    int cellUnderFocusIndex;
+    int cellUnderFocusRow;
+    int cellUnderFocusCol;
     std::vector<Widget*>& cells = m_boardView.getChildren();
-    for(int i = 0; i < 81; ++i)
+    for(int i = 0; i < cells.size(); ++i)
     {
         if(cells[i]->getFocus())
         {
-            m_board.set(i, num);
+            cellUnderFocusIndex = i;
+            cellUnderFocusRow = i / 9;
+            cellUnderFocusCol = i % 9;
+            break;
         }
     }
+
+    if(dir == Direction::Up)
+    {
+        if(cellUnderFocusRow == 0)  // can't find cell up to cell in the
+            return;                 // first row so return
+        
+        cells[cellUnderFocusIndex]->setFocus(false);
+        cellUnderFocusIndex -= 9;
+        cells[cellUnderFocusIndex]->setFocus(true);
+    }
+    else if(dir == Direction::Down)
+    {
+        if(cellUnderFocusRow == 8)
+            return;
+
+        cells[cellUnderFocusIndex]->setFocus(false);
+        cellUnderFocusIndex += 9;
+        cells[cellUnderFocusIndex]->setFocus(true);
+    }
+    else if(dir == Direction::Left)
+    {
+        if(cellUnderFocusCol == 0)
+            return;
+        
+        cells[cellUnderFocusIndex]->setFocus(false);
+        cellUnderFocusIndex -= 1;
+        cells[cellUnderFocusIndex]->setFocus(true);
+    }
+    else if(dir == Direction::Right)
+    {
+        if(cellUnderFocusCol == 8)
+            return;
+        
+        cells[cellUnderFocusIndex]->setFocus(false);
+        cellUnderFocusIndex += 1;
+        cells[cellUnderFocusIndex]->setFocus(true);
+    }
+
     updateView();
-    m_boardView.draw(m_renderWindow);
-    m_renderWindow.display();
 }
 
-void SudokuBoardController::onDeleteButton()
+void SudokuBoardController::generateBoard()
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    SudokuBoardGenerator::generate(m_board);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << std::endl << "Board generation time: " << duration.count() << " µs" << std::endl;
+
+    m_solvedBoard = m_board;
+    SudokuBoardSolver::solve(m_solvedBoard);
+
+    updateView();
+}
+
+void SudokuBoardController::solveBoard()
+{
+    if(!m_board.valid())
+    {
+        std::cout << std::endl << "Can't solve invalid board" << std::endl;
+        return;
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    SudokuBoardSolver::solve(m_board);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+    std::cout << std::endl << "Board solving time: " << duration.count() << " µs" << std::endl;
+
+    updateView();
+}
+
+void SudokuBoardController::clearBoard()
+{
+    m_board.clear();
+
+    updateView();
+}
+
+void SudokuBoardController::displaySolutions()
+{
+    if(!m_board.valid())
+    {
+        std::cout << std::endl << "Solutions cannot be found for the incorrect board" << std::endl;
+        return;
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+    const int& solutions_count = SudokuBoardSolver::solutions(m_board);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+
+    if(solutions_count == SudokuBoardSolver::MAX_SOLUTIONS)
+    {
+        std::cout << std::endl << "There are more than " << SudokuBoardSolver::MAX_SOLUTIONS << " solutions";
+    }
+    else
+    {
+        std::cout << std::endl << "Solutions: " << solutions_count;
+    }
+    std::cout << std::endl << "Solution generation time: " << duration.count() << " µs" << std::endl;
+}
+
+void SudokuBoardController::setCell(int value)
+{
+    if(value < 0 || value > 9)
+    {
+        std::cerr << "ERROR::SudokuBoarController::setCell()::Value out of (0-9) range" << std::endl;
+        return;
+    }
+
+    std::vector<Widget*>& cells = m_boardView.getChildren();
+    for(int i = 0; i < cells.size(); ++i)
+    {
+        if(cells[i]->getFocus())
+        {
+            m_board.set(i, value);
+        }
+    }
+
+    updateView();
+}
+
+void SudokuBoardController::deleteCell()
 {
     std::vector<Widget*>& cells = m_boardView.getChildren();
     for(int i = 0; i < cells.size(); ++i)
@@ -178,21 +225,29 @@ void SudokuBoardController::onDeleteButton()
             m_board.set(i, 0);
         }
     }
+
     updateView();
-    m_boardView.draw(m_renderWindow);
-    m_renderWindow.display();
 }
 
-void SudokuBoardController::onUndoButton()
+void SudokuBoardController::getHint()
 {
+    std::vector<Widget*>& cells = m_boardView.getChildren();
+    for(int i = 0; i < cells.size(); ++i)
+    {
+        if(cells[i]->getFocus())
+        {
+            m_board.set(i, m_solvedBoard(i));
+        }
+    }
+
+    updateView();
+}
+
+void SudokuBoardController::undoAction()
+{
+
+}
     
-}
-
-void SudokuBoardController::onHintButton()
-{
-
-}
-
 void SudokuBoardController::updateView()
 {
     for(int i = 0; i < 81; ++i)
@@ -213,4 +268,7 @@ void SudokuBoardController::updateView()
         else
             cell->setBgColor(sf::Color::White);
     }
+
+    m_boardView.draw(m_renderWindow);
+    m_renderWindow.display();
 }
