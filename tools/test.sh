@@ -5,7 +5,7 @@ cd tests
 mkdir build
 cd build
 cmake ..
-make
+cmake --build .
 # run each test
 for file in *.out
 do

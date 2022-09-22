@@ -12,7 +12,20 @@ Classic sudoku puzzle game with access to some additional features using SFML.
 
 ## Installation
 
-Clone this repository by ```git clone https://github.com/unreformable1/Sudoku.git```
+- Clone this repository by ```git clone https://github.com/unreformable1/Sudoku.git```  
+- Use script depending on OS:  
+Linux/macOS `bash build.sh`  
+Windows `build.bat`
+
+## Launching the program
+
+- cd build
+- ./sudoku
+
+## Dependencies required
+
+* CMake 3.0.0
+* SFML 2.5.1
 
 ## Contributing
 

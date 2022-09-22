@@ -4,6 +4,6 @@ cd ..
 mkdir build
 cd build
 cmake ..
-make
+cmake --build .
 ./sudoku
 rm sudoku

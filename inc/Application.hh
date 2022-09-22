@@ -80,7 +80,9 @@ void Application::run()
 
     m_renderWindow.display();
 
-    std::cout << std::endl << "Click H to get some help" << std::endl;
+    std::cout << std::endl << "Click H to see available options" << std::endl;
+
+    board_controller.generateBoard();
 
     while(m_renderWindow.isOpen())
     {
@@ -203,6 +205,7 @@ void Application::run()
                 {
                     std::cout << std::endl;
                     std::cout << "AVAILABLE KEY COMMANDS:" << std::endl;
+                    std::cout << "Arrows - moving over the board" << std::endl;
                     std::cout << "LMB + (1-9) - place digit on the board" << std::endl;
                     std::cout << "RMB - delete clicked cell" << std::endl;
                     std::cout << "G - generate random board (may take up to over 15 sec)" << std::endl;
