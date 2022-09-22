@@ -11,8 +11,9 @@
 class SudokuBoardController
 {
 public:
-    struct Action {
-
+    struct State {
+        int index;
+        int value;
     };
 
     enum Direction {
@@ -42,6 +43,8 @@ public:
 
 
 private:
+    void addLastState(int index, int value);
+    void resetLastStates();
     void updateView();
 
 
@@ -52,7 +55,7 @@ private:
 
     SudokuBoard m_solvedBoard;
 
-    std::stack<Action> m_actions;
+    std::stack<State> m_lastStates;
 };
 
 SudokuBoardController::SudokuBoardController(sf::RenderWindow& render_window, SudokuBoard& board, SudokuBoardView& board_view)
@@ -146,6 +149,8 @@ void SudokuBoardController::generateBoard()
     m_solvedBoard = m_board;
     SudokuBoardSolver::solve(m_solvedBoard);
 
+    resetLastStates();
+
     updateView();
 }
 
@@ -208,6 +213,7 @@ void SudokuBoardController::setCell(int value)
     {
         if(cells[i]->getFocus())
         {
+            addLastState(i, m_board(i));
             m_board.set(i, value);
         }
     }
@@ -222,6 +228,7 @@ void SudokuBoardController::deleteCell()
     {
         if(cells[i]->getFocus())
         {
+            addLastState(i, m_board(i));
             m_board.set(i, 0);
         }
     }
@@ -245,7 +252,40 @@ void SudokuBoardController::getHint()
 
 void SudokuBoardController::undoAction()
 {
+    if(m_lastStates.empty())
+        return;
 
+    const State& state = m_lastStates.top();
+    std::vector<Widget*>& cells = m_boardView.getChildren();
+    for(int i = 0; i < cells.size(); ++i)
+    {
+        if(cells[i]->getFocus())
+        {
+            cells[i]->setFocus(false);
+        }
+    }
+    cells[state.index]->setFocus(true);
+    m_board.set(state.index, state.value);
+    m_lastStates.pop();
+
+    updateView();
+}
+
+void SudokuBoardController::addLastState(int index, int value)
+{
+    State last_state;
+    last_state.index = index;
+    last_state.value = value;
+
+    m_lastStates.emplace(last_state);
+}
+
+void SudokuBoardController::resetLastStates()
+{
+    while(!m_lastStates.empty())
+    {
+        m_lastStates.pop();
+    }
 }
     
 void SudokuBoardController::updateView()

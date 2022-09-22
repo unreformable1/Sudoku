@@ -44,7 +44,7 @@ void Application::run()
 
     Button delete_button(sf::Vector2f(BOARD_WIDTH + 25, 100), sf::Vector2f(100, 50), "Delete");
     Button hint_button(sf::Vector2f(BOARD_WIDTH + 25, 175), sf::Vector2f(100, 50), "Hint");
-    //Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
+    Button undo_button(sf::Vector2f(BOARD_WIDTH + 25, 25), sf::Vector2f(100, 50), "Undo");
 
     Button num1_button(sf::Vector2f(BOARD_WIDTH + 25, 250),  sf::Vector2f(65, 65), "1");
     Button num2_button(sf::Vector2f(BOARD_WIDTH + 100, 250), sf::Vector2f(65, 65), "2");
@@ -62,7 +62,7 @@ void Application::run()
 
     widgets_manager.add(&delete_button);
     widgets_manager.add(&hint_button);
-    //widgets_manager.add(&undo_button);
+    widgets_manager.add(&undo_button);
     widgets_manager.add(&num1_button);
     widgets_manager.add(&num2_button);
     widgets_manager.add(&num3_button);
@@ -110,6 +110,10 @@ void Application::run()
                     else if(hint_button.contains(mouse_pos))
                     {
                         board_controller.getHint();
+                    }
+                    else if(undo_button.contains(mouse_pos))
+                    {
+                        board_controller.undoAction();
                     }
                     else if(num1_button.contains(mouse_pos))
                     {
