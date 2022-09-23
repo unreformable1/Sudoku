@@ -12,10 +12,10 @@ class SudokuBoard: public Board<9,9,int>
 public:
     bool full() const;
     bool valid() const;
-    bool valid(int row, int col) const;
-    bool valid(int index) const;
-    bool validMove(int row, int col, int value) const;
-    bool validMove(int index, int value) const;
+    bool valid(const int& row, const int& col) const;
+    bool valid(const int& index) const;
+    bool validMove(const int& row, const int& col, const int& value) const;
+    bool validMove(const int& index, const int& value) const;
 
 
 private:
@@ -23,16 +23,20 @@ private:
     bool validCols() const;
     bool validChunks() const;
 
-    bool validRow(int row) const;
-    bool validCol(int col) const;
-    bool validChunk(int chunk) const;
+    bool validRow(const int& row) const;
+    bool validCol(const int& col) const;
+    bool validChunk(const int& chunk) const;
 
     bool validCells(int* cells, int cells_count) const;
 
 
-    int countValuesInRow(int row, int value) const;
-    int countValuesInCol(int col, int value) const;
-    int countValuesInChunk(int chunk, int value) const;
+    int countValuesInRow(const int& row, const int& value) const;
+    int countValuesInCol(const int& col, const int& value) const;
+    int countValuesInChunk(const int& chunk, const int& value) const;
+
+    bool isInRow(const int& row, const int& value) const;
+    bool isInCol(const int& col, const int& value) const;
+    bool isInChunk(const int& chunk, const int& value) const;
 };
 
 bool SudokuBoard::full() const
@@ -52,7 +56,7 @@ bool SudokuBoard::valid() const
     return validRows() && validCols() && validChunks();
 }
 
-bool SudokuBoard::valid(int row, int col) const
+bool SudokuBoard::valid(const int& row, const int& col) const
 {
     int value = m_cells[9*row + col];
 
@@ -69,7 +73,7 @@ bool SudokuBoard::valid(int row, int col) const
         && countValuesInChunk(chunk, value) < 2;
 }
 
-bool SudokuBoard::valid(int index) const
+bool SudokuBoard::valid(const int& index) const
 {
     // Convert index to row and col
     int row = index / 9;
@@ -78,7 +82,7 @@ bool SudokuBoard::valid(int index) const
     return valid(row, col);
 }
 
-bool SudokuBoard::validMove(int row, int col, int value) const
+bool SudokuBoard::validMove(const int& row, const int& col, const int& value) const
 {
     // Calculate chunk depending on row and col values
     int chunk_row = row / 3;
@@ -86,12 +90,12 @@ bool SudokuBoard::validMove(int row, int col, int value) const
     int chunk = 3*chunk_row + chunk_col;
     
     // Row, col and chunk cannot have given value
-    return countValuesInRow(row, value) == 0
-        && countValuesInCol(col, value) == 0
-        && countValuesInChunk(chunk, value) == 0;
+    return isInRow(row, value) == false
+        && isInCol(col, value) == false
+        && isInChunk(chunk, value) == false;
 }
 
-bool SudokuBoard::validMove(int index, int value) const
+bool SudokuBoard::validMove(const int& index, const int& value) const
 {
     // Convert index to row and col
     int row = index / 9;
@@ -130,7 +134,7 @@ bool SudokuBoard::validChunks() const
     return true;
 }
 
-bool SudokuBoard::validRow(int row) const
+bool SudokuBoard::validRow(const int& row) const
 {
     int row_cells[9];
 
@@ -141,7 +145,7 @@ bool SudokuBoard::validRow(int row) const
     return validCells(row_cells, 9);
 }
 
-bool SudokuBoard::validCol(int col) const
+bool SudokuBoard::validCol(const int& col) const
 {
     int col_cells[9];
 
@@ -152,7 +156,7 @@ bool SudokuBoard::validCol(int col) const
     return validCells(col_cells, 9);
 }
 
-bool SudokuBoard::validChunk(int chunk) const
+bool SudokuBoard::validChunk(const int& chunk) const
 {
     // Compute chunk starting row and col (left top corner)
     int chunk_row = 0;
@@ -204,7 +208,7 @@ bool SudokuBoard::validCells(int* cells, int cells_count) const
     return true;
 }
 
-int SudokuBoard::countValuesInRow(int row, int value) const
+int SudokuBoard::countValuesInRow(const int& row, const int& value) const
 {
     int count = 0;
     for(int col = 0; col < 9; ++col)
@@ -215,7 +219,7 @@ int SudokuBoard::countValuesInRow(int row, int value) const
     return count;
 }
 
-int SudokuBoard::countValuesInCol(int col, int value) const
+int SudokuBoard::countValuesInCol(const int& col, const int& value) const
 {
     int count = 0;
     for(int row = 0; row < 9; ++row)
@@ -226,7 +230,7 @@ int SudokuBoard::countValuesInCol(int col, int value) const
     return count;
 }
 
-int SudokuBoard::countValuesInChunk(int chunk, int value) const
+int SudokuBoard::countValuesInChunk(const int& chunk, const int& value) const
 {
     // Calculate chunk "starting" row and col
     int chunk_row = 3*(chunk / 3);
@@ -242,4 +246,41 @@ int SudokuBoard::countValuesInChunk(int chunk, int value) const
         }
     }
     return count;
+}
+
+bool SudokuBoard::isInRow(const int& row, const int& value) const
+{
+    for(int col = 0; col < 9; ++col)
+    {
+        if(m_cells[9*row + col] == value)
+            return true;
+    }
+    return false;
+}
+
+bool SudokuBoard::isInCol(const int& col, const int& value) const
+{
+    for(int row = 0; row < 9; ++row)
+    {
+        if(m_cells[9*row + col] == value)
+            return true;
+    }
+    return false;
+}
+
+bool SudokuBoard::isInChunk(const int& chunk, const int& value) const
+{
+    // Calculate chunk "starting" row and col
+    int chunk_row = 3*(chunk / 3);
+    int chunk_col = 3*(chunk % 3);
+
+    for(int row = chunk_row; row < chunk_row + 3; ++row)
+    {
+        for(int col = chunk_col; col < chunk_col + 3; ++col)
+        {
+            if(m_cells[9*row + col] == value)
+                return true;
+        }
+    }
+    return false;
 }
