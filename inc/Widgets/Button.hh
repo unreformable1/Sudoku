@@ -15,4 +15,6 @@ Button::Button(const sf::Vector2f& pos, const sf::Vector2f& size, const std::str
     setPosition(pos);
     setSize(size);
     setTextString(text);
+    setBgOutlineThickness(1);
+    setBgOutlineColor(sf::Color::Black);
 }
