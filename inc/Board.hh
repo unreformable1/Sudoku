@@ -26,16 +26,16 @@ public:
 
 
     // Returns cell value by const reference
-    const T& get(int row, int col) const;
+    const T& get(const int& row, const int& col) const;
 
     // Returns cell value by const reference
-    const T& get(int index) const;
+    const T& get(const int& index) const;
 
     // Returns cell value by reference
-    T& get(int row, int col);
+    T& get(const int& row, const int& col);
 
     // Returns cell value by reference
-    T& get(int index);
+    T& get(const int& index);
 
 
     // Returns cells as 1D const array
@@ -46,17 +46,17 @@ public:
 
 
     // Sets cell to given value
-    void set(int row, int col, int value);
+    void set(const int& row, const int& col, const T& value);
 
     // Sets cell to given value
-    void set(int index, int value);
+    void set(const int& index, const T& value);
 
 
     // Sets cell value to default-initalized
-    void remove(int row, int col);
+    void remove(const int& row, const int& col);
 
     // Sets cell value to default-initalized
-    void remove(int index);
+    void remove(const int& index);
 
 
     // Sets all cells value to given value
@@ -68,16 +68,16 @@ public:
 
 
     // Returns cell value by const reference
-    const T& operator()(int row, int col) const;
+    const T& operator()(const int& row, const int& col) const;
 
     // Returns cell value by const reference
-    const T& operator()(int index) const;
+    const T& operator()(const int& index) const;
 
     // Returns cell value by reference
-    T& operator()(int row, int col);
+    T& operator()(const int& row, const int& col);
 
     // Returns cell value by reference
-    T& operator()(int index);
+    T& operator()(const int& index);
 
 
 protected:
@@ -85,25 +85,25 @@ protected:
 };
 
 template <int N, int M, typename T>
-const T& Board<N,M,T>::get(int row, int col) const
+const T& Board<N,M,T>::get(const int& row, const int& col) const
 {
     return m_cells[N*row + col];
 }
 
 template <int N, int M, typename T>
-const T& Board<N,M,T>::get(int index) const
+const T& Board<N,M,T>::get(const int& index) const
 {
     return m_cells[index];
 }
 
 template <int N, int M, typename T>
-T& Board<N,M,T>::get(int row, int col)
+T& Board<N,M,T>::get(const int& row, const int& col)
 {
     return m_cells[N*row + col];
 }
 
 template <int N, int M, typename T>
-T& Board<N,M,T>::get(int index)
+T& Board<N,M,T>::get(const int& index)
 {
     return m_cells[index];
 }
@@ -121,25 +121,25 @@ T* Board<N,M,T>::get()
 }
 
 template <int N, int M, typename T>
-void Board<N,M,T>::set(int row, int col, int value)
+void Board<N,M,T>::set(const int& row, const int& col, const T& value)
 {
     m_cells[N*row + col] = value;
 }
 
 template <int N, int M, typename T>
-void Board<N,M,T>::set(int index, int value)
+void Board<N,M,T>::set(const int& index, const T& value)
 {
     m_cells[index] = value;
 }
 
 template <int N, int M, typename T>
-void Board<N,M,T>::remove(int row, int col)
+void Board<N,M,T>::remove(const int& row, const int& col)
 {
     m_cells[N*row + col] = T{};
 }
 
 template <int N, int M, typename T>
-void Board<N,M,T>::remove(int index)
+void Board<N,M,T>::remove(const int& index)
 {
     m_cells[index] = T{};
 }
@@ -170,25 +170,25 @@ void Board<N,M,T>::print() const
 }
 
 template <int N, int M, typename T>
-const T& Board<N,M,T>::operator()(int row, int col) const
+const T& Board<N,M,T>::operator()(const int& row, const int& col) const
 {
     return m_cells[N*row + col];
 }
 
 template <int N, int M, typename T>
-const T& Board<N,M,T>::operator()(int index) const
+const T& Board<N,M,T>::operator()(const int& index) const
 {
     return m_cells[index];
 }
 
 template <int N, int M, typename T>
-T& Board<N,M,T>::operator()(int row, int col)
+T& Board<N,M,T>::operator()(const int& row, const int& col)
 {
     return m_cells[N*row + col];
 }
 
 template <int N, int M, typename T>
-T& Board<N,M,T>::operator()(int index)
+T& Board<N,M,T>::operator()(const int& index)
 {
     return m_cells[index];
 }
