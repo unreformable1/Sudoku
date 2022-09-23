@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SudokuBoard.hh"
-#include "TextBox.hh"
+#include "Button.hh"
 
 #include <vector>
 
@@ -57,7 +57,7 @@ void SudokuBoardView::initCells(const sf::Vector2f& board_pos, const sf::Vector2
             pos_x = board_frame_thickness + cell_frame_thickness;
             for(int col = 0; col < 9; ++col)
             {
-                m_children.emplace_back(new TextBox(sf::Vector2f(pos_x, pos_y), cell_size, "0"));
+                m_children.emplace_back(new Button(sf::Vector2f(pos_x, pos_y), cell_size, "0"));
 
                 pos_x += cell_size.x;
                 pos_x += cell_frame_thickness;
