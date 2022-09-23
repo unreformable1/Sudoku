@@ -13,29 +13,29 @@ public:
 
 public:
     static bool solve(SudokuBoard& board);
-    static int solutions(const SudokuBoard& board, const int& max_count = SudokuBoardSolver::MAX_SOLUTIONS);
+    static int solutions(const SudokuBoard& board, const int& solutions_limit = SudokuBoardSolver::MAX_SOLUTIONS);
 
 
 private:
     static bool solveIterative(SudokuBoard& board);
     static bool solveRecursive(SudokuBoard& board, int pos);
-    static void solutions(SudokuBoard& board, int pos, int& count, const int& max_count);
+    static void solutions(SudokuBoard& board, int pos, int& count, const int& solutions_limit);
 };
 
-const int SudokuBoardSolver::MAX_SOLUTIONS = 1000;
+const int SudokuBoardSolver::MAX_SOLUTIONS = 100;
 
 bool SudokuBoardSolver::solve(SudokuBoard& board)
 {
     return solveRecursive(board, 0);
 }
 
-int SudokuBoardSolver::solutions(const SudokuBoard& board, const int& max_count)
+int SudokuBoardSolver::solutions(const SudokuBoard& board, const int& solutions_limit)
 {
     SudokuBoard tmp(board);             // Create modifable copy of input board
 
     int solutions_count = 0;
 
-    solutions(tmp, 0, solutions_count, max_count);
+    solutions(tmp, 0, solutions_count, solutions_limit);
 
     return solutions_count;
 }
@@ -115,14 +115,14 @@ bool SudokuBoardSolver::solveRecursive(SudokuBoard& board, int pos)
     }
 }
 
-void SudokuBoardSolver::solutions(SudokuBoard& board, int pos, int& count, const int& max_count)
+void SudokuBoardSolver::solutions(SudokuBoard& board, int pos, int& count, const int& solutions_limit)
 {
-    if(count >= max_count || count >= SudokuBoardSolver::MAX_SOLUTIONS)
+    if(count == solutions_limit || count == SudokuBoardSolver::MAX_SOLUTIONS)
         return;
     else if(pos == 81)
         ++count;
     else if(board(pos) != 0)
-        solutions(board, pos + 1, count, max_count);
+        solutions(board, pos + 1, count, solutions_limit);
     else
     {
         for(int val = 1; val < 10; ++val)
@@ -130,7 +130,7 @@ void SudokuBoardSolver::solutions(SudokuBoard& board, int pos, int& count, const
             if(board.validMove(pos, val))
             {
                 board.set(pos, val);
-                solutions(board, pos + 1, count, max_count);
+                solutions(board, pos + 1, count, solutions_limit);
             }
         }
         board.set(pos, 0);
