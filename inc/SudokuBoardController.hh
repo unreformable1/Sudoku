@@ -31,9 +31,9 @@ public:
     void moveTo(Direction dir);
 
     void generateBoard();
-    void solveBoard();
+/*     void solveBoard();
     void clearBoard();
-    void displaySolutions();
+    void displaySolutions(); */
     
     void setCell(int value);
     void deleteCell();
@@ -54,6 +54,8 @@ private:
     SudokuBoardView& m_boardView;
 
     SudokuBoard m_solvedBoard;
+
+    SudokuBoard m_generatedBoard;
 
     std::stack<State> m_lastStates;
 };
@@ -88,6 +90,7 @@ void SudokuBoardController::moveTo(Direction dir)
     int cellUnderFocusRow;
     int cellUnderFocusCol;
     std::vector<Widget*>& cells = m_boardView.getChildren();
+    bool found = false;
     for(int i = 0; i < cells.size(); ++i)
     {
         if(cells[i]->getFocus())
@@ -95,9 +98,12 @@ void SudokuBoardController::moveTo(Direction dir)
             cellUnderFocusIndex = i;
             cellUnderFocusRow = i / 9;
             cellUnderFocusCol = i % 9;
+            found = true;
             break;
         }
     }
+    if(!found)
+        return;
 
     if(dir == Direction::Up)
     {
@@ -146,15 +152,31 @@ void SudokuBoardController::generateBoard()
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
     std::cout << std::endl << "Board generation time: " << duration.count() << " µs" << std::endl;
 
+    // Assing solved version of generated board
     m_solvedBoard = m_board;
     SudokuBoardSolver::solve(m_solvedBoard);
+
+    // Assign board after generation
+    m_generatedBoard = m_board;
+    std::vector<Widget*>& cells = m_boardView.getChildren();
+    for(int i = 0; i < 81; ++i)
+    {
+        if(m_generatedBoard(i) != 0)
+        {
+            cells[i]->setTextColor(sf::Color::Blue);
+        }
+        else
+        {
+            cells[i]->setTextColor(sf::Color::Black);
+        }
+    }
 
     resetLastStates();
 
     updateView();
 }
 
-void SudokuBoardController::solveBoard()
+/* void SudokuBoardController::solveBoard()
 {
     if(!m_board.valid())
     {
@@ -198,7 +220,7 @@ void SudokuBoardController::displaySolutions()
         std::cout << std::endl << "Solutions: " << solutions_count;
     }
     std::cout << std::endl << "Solution generation time: " << duration.count() << " µs" << std::endl;
-}
+} */
 
 void SudokuBoardController::setCell(int value)
 {
@@ -213,6 +235,9 @@ void SudokuBoardController::setCell(int value)
     {
         if(cells[i]->getFocus())
         {
+            if(m_generatedBoard(i) != 0)
+                return;
+            
             addLastState(i, m_board(i));
             m_board.set(i, value);
         }
@@ -228,6 +253,9 @@ void SudokuBoardController::deleteCell()
     {
         if(cells[i]->getFocus())
         {
+            if(m_generatedBoard(i) != 0)
+                return;
+            
             addLastState(i, m_board(i));
             m_board.set(i, 0);
         }
