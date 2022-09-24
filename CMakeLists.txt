@@ -6,6 +6,16 @@ project(${PROJECT_NAME})
 
 set(SRC_FILES
     src/main.cpp
+    src/Application.cpp
+    src/RNG.cpp
+    src/SudokuBoard.cpp
+    src/SudokuBoardController.cpp
+    src/SudokuBoardGenerator.cpp
+    src/SudokuBoardSolver.cpp
+    src/SudokuBoardView.cpp
+    src/WidgetsManager.cpp
+    src/Widgets/Button.cpp
+    src/Widgets/Widget.cpp
 )
 
 find_package(SFML 2 REQUIRED graphics system window)
