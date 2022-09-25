@@ -1,5 +1,8 @@
 #include "Application.hh"
 
+#include "Button.hh"
+#include "SudokuBoardController.hh"
+#include "WidgetsManager.hh"
 
 
 Application::Application()

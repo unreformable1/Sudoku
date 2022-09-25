@@ -1,5 +1,6 @@
 #include "SudokuBoardController.hh"
 
+#include <chrono>
 
 
 SudokuBoardController::SudokuBoardController(sf::RenderWindow& render_window, SudokuBoard& board, SudokuBoardView& board_view)

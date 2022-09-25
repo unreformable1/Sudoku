@@ -2,9 +2,6 @@
 
 #include "Board.hh"
 
-#include <vector>
-
-#include <SFML/Graphics.hpp>
 
 
 class SudokuBoard: public Board<9,9,int>

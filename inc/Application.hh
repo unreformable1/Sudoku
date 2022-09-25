@@ -1,15 +1,13 @@
 #pragma once
 
-#include "Button.hh"
-#include "SudokuBoardController.hh"
-#include "WidgetsManager.hh"
+#include <SFML/Graphics.hpp>
+
 
 #define WIN_WIDTH 900
 #define WIN_HEIGHT 600
 
 #define BOARD_WIDTH 600
 #define BOARD_HEIGHT 600
-
 
 
 class Application
