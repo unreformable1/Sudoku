@@ -1,6 +1,7 @@
 #include "Application.hh"
 
 #include "Button.hh"
+#include "Global.hh"
 #include "SudokuBoardController.hh"
 #include "WidgetsManager.hh"
 
