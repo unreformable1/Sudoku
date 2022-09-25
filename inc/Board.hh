@@ -9,74 +9,160 @@
  * 
  * @tparam N number of rows
  * @tparam M number of columns
- * @tparam T data stored inside each board's cell
+ * @tparam T data stored in each cell
  */
 template <int N, int M, typename T>
 class Board
 {
 public:
-    // Returns number of rows
+    /**
+     * @brief Returns the number of rows of the board
+     * 
+     * @return constexpr int number of rows
+     */
     constexpr int rows() const { return N; }
 
-    // Return number of columns
+    
+    /**
+     * @brief Returns the number of columns of the board
+     * 
+     * @return constexpr int number of columns
+     */
     constexpr int cols() const { return M; }
 
-    // Returns number of cells
+    /**
+     * @brief Returns the number of cells of the board
+     * 
+     * @return constexpr int number of cells
+     */
     constexpr int size() const { return N*M; }
 
 
-    // Returns cell value by const reference
+    /**
+     * @brief Returns the data of the specified cell
+     * 
+     * @param row row number
+     * @param col column number
+     * @return const T& constant reference to data
+     */
     const T& get(const int& row, const int& col) const;
 
-    // Returns cell value by const reference
+    /**
+     * @brief Returns the data of the specified cell
+     * 
+     * @param index index number
+     * @return const T& constant reference to data
+     */
     const T& get(const int& index) const;
 
-    // Returns cell value by reference
+    /**
+     * @brief Returns the data of the specified cell
+     * 
+     * @param row row number
+     * @param col column number
+     * @return T& reference to data
+     */
     T& get(const int& row, const int& col);
 
-    // Returns cell value by reference
+    /**
+     * @brief Returns the data of the specified cell
+     * 
+     * @param index index number
+     * @return T& reference to data
+     */
     T& get(const int& index);
 
 
-    // Returns cells as 1D const array
+    /**
+     * @brief Returns the board data as a 1D array
+     * 
+     * @return const T* constant pointer to data
+     */
     const T* get() const;
 
-    // Returns cells as 1D array
+    /**
+     * @brief Returns the board data as a 1D array
+     * 
+     * @return T* pointer to data
+     */
     T* get();
 
 
-    // Sets cell to given value
+    /**
+     * @brief Sets the value of a board cell to the specified value
+     * 
+     * @param row row number
+     * @param col column number
+     * @param value specified value
+     */
     void set(const int& row, const int& col, const T& value);
 
-    // Sets cell to given value
+    /**
+     * @brief Sets the value of a board cell to the specified value
+     * 
+     * @param index index number
+     * @param value specified value
+     */
     void set(const int& index, const T& value);
 
 
-    // Sets cell value to default-initalized
+    /**
+     * @brief Sets the cell's value to the default value
+     * 
+     * @param row row number
+     * @param col column number
+     */
     void remove(const int& row, const int& col);
 
-    // Sets cell value to default-initalized
+    /**
+     * @brief Sets the cell's value to the default value
+     * 
+     * @param index index number
+     */
     void remove(const int& index);
 
 
-    // Sets all cells value to given value
+    /**
+     * @brief Sets the value of all cells to the specified value or, if no value
+     * is specified, to the default value
+     * 
+     * @param value specified value
+     */
     void clear(const T& value = T{});
 
 
-    // Prints board
-    void print() const;
-
-
-    // Returns cell value by const reference
+    /**
+     * @brief Overloading the operator () to return a value under a specified cell
+     * 
+     * @param row row number
+     * @param col column number
+     * @return const T& constant reference to data
+     */
     const T& operator()(const int& row, const int& col) const;
 
-    // Returns cell value by const reference
+    /**
+     * @brief Overloading the operator () to return a value under a specified cell
+     * 
+     * @param index index number
+     * @return const T& constant reference to data
+     */
     const T& operator()(const int& index) const;
 
-    // Returns cell value by reference
+    /**
+     * @brief Overloading the operator () to return a value under a specified cell
+     * 
+     * @param row row number
+     * @param col column number
+     * @return T& reference to data
+     */
     T& operator()(const int& row, const int& col);
 
-    // Returns cell value by reference
+    /**
+     * @brief Overloading the operator () to return a value under a specified cell
+     * 
+     * @param index index number
+     * @return T& reference to data
+     */
     T& operator()(const int& index);
 
 
@@ -153,19 +239,6 @@ void Board<N,M,T>::clear(const T& value)
         {
             m_cells[N*row + col] = value;
         }
-    }
-}
-
-template <int N, int M, typename T>
-void Board<N,M,T>::print() const
-{
-    for(int row = 0; row < N; ++row)
-    {
-        for(int col = 0; col < M; ++col)
-        {
-            std::cout << std::setw(2) << m_cells[N*row + col];
-        }
-        std::cout << std::endl;
     }
 }
 
